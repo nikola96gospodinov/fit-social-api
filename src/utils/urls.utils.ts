@@ -1,5 +1,5 @@
 import { isEmpty } from "lodash";
-import { removeEmptyValues, turnAllObjectValuesToString } from "./object.utils";
+import { removeEmptyValues } from "./object.utils";
 
 export const addQueryParamsToUrl = (
   url: string,
@@ -7,14 +7,12 @@ export const addQueryParamsToUrl = (
 ) => {
   if (!queryParams) return url;
 
-  const queryParamsWithoutEmptyValues = removeEmptyValues(queryParams);
+  const queryParamsWithoutEmptyValues = removeEmptyValues(
+    queryParams
+  ) as Record<string, string>;
 
   if (isEmpty(queryParamsWithoutEmptyValues)) return url;
 
-  const sanitizedQueryParams = turnAllObjectValuesToString(
-    queryParamsWithoutEmptyValues
-  );
-
-  const urlSearchParams = new URLSearchParams(sanitizedQueryParams);
+  const urlSearchParams = new URLSearchParams(queryParamsWithoutEmptyValues);
   return `${url}?${urlSearchParams.toString()}`;
 };

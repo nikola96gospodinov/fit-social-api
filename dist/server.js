@@ -10,10 +10,6 @@ const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-// Home page
-app.get("/", (req, res, next) => {
-    res.json({ message: "hello" });
-});
 // Catching errors in Node.js (outside of Express)
 process.on("uncaughtException", () => { });
 process.on("unhandledRejection", () => { });

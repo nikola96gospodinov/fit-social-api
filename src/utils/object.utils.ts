@@ -1,10 +1,4 @@
-import { omitBy, isUndefined, cloneDeepWith } from "lodash";
-
-export const turnAllObjectValuesToString = (
-  obj: Record<string, unknown>
-): Record<string, string> => {
-  return cloneDeepWith(obj, (value) => String(value));
-};
+import { omitBy, isUndefined } from "lodash";
 
 export const removeEmptyValues = (
   data: Record<string, unknown>

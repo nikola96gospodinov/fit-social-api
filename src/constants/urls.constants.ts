@@ -4,7 +4,7 @@ import { addQueryParamsToUrl } from "../utils/urls.utils";
 
 export const URL = {
   EXERCISE: {
-    base: "https://exercisedb.p.rapidapi.com/exercises/exercise",
+    base: "https://exercisedb.p.rapidapi.com/exercises",
 
     GET_EXERCISES(queryParams?: GetExercisesProps): string {
       return addQueryParamsToUrl(this.base, queryParams);

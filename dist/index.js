@@ -29,7 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const server_1 = __importDefault(require("./server"));
-// import "./schedules/update-exercises";
+require("./schedules/update-exercises");
 const port = process.env.PORT || 3000;
 server_1.default.listen(port, () => {
     console.log(`Server running on port ${port}`);

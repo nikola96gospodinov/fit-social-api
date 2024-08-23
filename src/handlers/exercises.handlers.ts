@@ -6,40 +6,39 @@ import {
   bodyPartOptions,
   equipmentOptions,
 } from "../types/exercises.types";
+import { Schema } from "../utils/validation.utils";
+import { numericString } from "../types/schema-helpers";
 
-const queryParamsSchema = z
-  .object({
-    offset: z.string().optional(),
-    limit: z.string().optional(),
+export const getAllExercisesSchema: Schema = {
+  querySchema: z.strictObject({
+    offset: numericString.optional(),
+    limit: numericString.optional(),
     search: z.string().optional(),
-  })
-  .strict();
-
-const bodySchema = z
-  .object({
-    targetFilters: z.array(z.enum(targetOptions)).optional(),
-    bodyPartFilters: z.array(z.enum(bodyPartOptions)).optional(),
-    equipmentFilters: z.array(z.enum(equipmentOptions)).optional(),
-  })
-  .strict();
+  }),
+  bodySchema: z.strictObject({
+    targetFilters: z
+      .array(z.enum(targetOptions), {
+        message: "Invalid target filters",
+      })
+      .optional(),
+    bodyPartFilters: z
+      .array(z.enum(bodyPartOptions), {
+        message: "Invalid body part filters",
+      })
+      .optional(),
+    equipmentFilters: z
+      .array(z.enum(equipmentOptions), {
+        message: "Invalid equipment filters",
+      })
+      .optional(),
+  }),
+};
 
 export const getAllExercises = async (req: Request, res: Response) => {
   try {
     const { query, body } = req;
 
-    const queryParams = queryParamsSchema.safeParse(query);
-
-    if (!queryParams.success) {
-      return res.status(400).json({ message: "Invalid query parameters" });
-    }
-
-    const validatedBody = bodySchema.safeParse(body);
-
-    if (!validatedBody.success) {
-      return res.status(400).json({ message: "Invalid body parameters" });
-    }
-
-    const { offset = "0", limit = "10", search } = queryParams.data;
+    const { offset = "0", limit = "10", search } = query;
 
     const exercises = readFileSync("src/assets/exercises.json", "utf8");
 

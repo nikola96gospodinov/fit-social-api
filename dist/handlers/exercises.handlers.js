@@ -9,36 +9,51 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllExercises = void 0;
+exports.getAllExercises = exports.getAllExercisesSchema = void 0;
 const fs_1 = require("fs");
 const zod_1 = require("zod");
 const exercises_types_1 = require("../types/exercises.types");
-const queryParamsSchema = zod_1.z
-    .object({
-    offset: zod_1.z.string().optional(),
-    limit: zod_1.z.string().optional(),
-    search: zod_1.z.string().optional(),
-})
-    .strict();
-const bodySchema = zod_1.z
-    .object({
-    targetFilters: zod_1.z.array(zod_1.z.enum(exercises_types_1.targetOptions)).optional(),
-    bodyPartFilters: zod_1.z.array(zod_1.z.enum(exercises_types_1.bodyPartOptions)).optional(),
-    equipmentFilters: zod_1.z.array(zod_1.z.enum(exercises_types_1.equipmentOptions)).optional(),
-})
-    .strict();
+const schema_helpers_1 = require("../types/schema-helpers");
+exports.getAllExercisesSchema = {
+    querySchema: zod_1.z.strictObject({
+        offset: schema_helpers_1.numericString.optional(),
+        limit: schema_helpers_1.numericString.optional(),
+        search: zod_1.z.string().optional(),
+    }),
+    bodySchema: zod_1.z.strictObject({
+        targetFilters: zod_1.z
+            .array(zod_1.z.enum(exercises_types_1.targetOptions), {
+            message: "Invalid target filters",
+        })
+            .optional(),
+        bodyPartFilters: zod_1.z
+            .array(zod_1.z.enum(exercises_types_1.bodyPartOptions), {
+            message: "Invalid body part filters",
+        })
+            .optional(),
+        equipmentFilters: zod_1.z
+            .array(zod_1.z.enum(exercises_types_1.equipmentOptions), {
+            message: "Invalid equipment filters",
+        })
+            .optional(),
+    }, {
+        errorMap: (error) => {
+            var _a;
+            if (error.code === "unrecognized_keys") {
+                return {
+                    message: "Unrecognized key(s) in body parameters",
+                };
+            }
+            return {
+                message: (_a = error.message) !== null && _a !== void 0 ? _a : "Invalid body parameters", // Default error message
+            };
+        },
+    }),
+};
 const getAllExercises = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { query, body } = req;
-        const queryParams = queryParamsSchema.safeParse(query);
-        if (!queryParams.success) {
-            return res.status(400).json({ message: "Invalid query parameters" });
-        }
-        const validatedBody = bodySchema.safeParse(body);
-        if (!validatedBody.success) {
-            return res.status(400).json({ message: "Invalid body parameters" });
-        }
-        const { offset = "0", limit = "10", search } = queryParams.data;
+        const { offset = "0", limit = "10", search } = query;
         const exercises = (0, fs_1.readFileSync)("src/assets/exercises.json", "utf8");
         const response = JSON.parse(exercises).slice(Number(offset), Number(limit));
         res.status(200).json(response);

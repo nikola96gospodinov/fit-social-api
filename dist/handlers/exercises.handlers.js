@@ -43,16 +43,26 @@ const getAllExercisesSchema = {
 };
 const getAllExercises = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { query } = (0, validation_utils_1.validateRoute)({
+        const { query, body } = (0, validation_utils_1.validateRoute)({
             schema: getAllExercisesSchema,
             req,
         });
-        const { offset = "0", limit = "10", search } = query;
         const fileContent = (0, fs_1.readFileSync)("src/assets/exercises.json", "utf8");
         const exercises = JSON.parse(fileContent);
-        let response = [];
+        let response = exercises;
+        const { targetFilters, bodyPartFilters, equipmentFilters } = body;
+        const { offset = "0", limit = "10", search } = query;
+        if (targetFilters) {
+            response = response.filter((exercise) => targetFilters.includes(exercise.target));
+        }
+        if (bodyPartFilters) {
+            response = response.filter((exercise) => bodyPartFilters.includes(exercise.bodyPart));
+        }
+        if (equipmentFilters) {
+            response = response.filter((exercise) => equipmentFilters.includes(exercise.equipment));
+        }
         if (search) {
-            response = (0, search_utils_1.searchByWordOccurrence)(exercises, search);
+            response = (0, search_utils_1.searchByWordOccurrence)(response, search);
         }
         response = response.slice(Number(offset), Number(limit));
         res.status(200).json(response);

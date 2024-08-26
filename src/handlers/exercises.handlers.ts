@@ -39,21 +39,40 @@ const getAllExercisesSchema = {
 
 export const getAllExercises = async (req: Request, res: Response) => {
   try {
-    const { query } = validateRoute({
+    const { query, body } = validateRoute({
       schema: getAllExercisesSchema,
       req,
     });
-
-    const { offset = "0", limit = "10", search } = query;
 
     const fileContent = readFileSync("src/assets/exercises.json", "utf8");
 
     const exercises = JSON.parse(fileContent);
 
-    let response: Exercise[] = [];
+    let response = exercises;
+
+    const { targetFilters, bodyPartFilters, equipmentFilters } = body;
+    const { offset = "0", limit = "10", search } = query;
+
+    if (targetFilters) {
+      response = response.filter((exercise: Exercise) =>
+        targetFilters.includes(exercise.target)
+      );
+    }
+
+    if (bodyPartFilters) {
+      response = response.filter((exercise: Exercise) =>
+        bodyPartFilters.includes(exercise.bodyPart)
+      );
+    }
+
+    if (equipmentFilters) {
+      response = response.filter((exercise: Exercise) =>
+        equipmentFilters.includes(exercise.equipment)
+      );
+    }
 
     if (search) {
-      response = searchByWordOccurrence(exercises, search);
+      response = searchByWordOccurrence(response, search);
     }
 
     response = response.slice(Number(offset), Number(limit));

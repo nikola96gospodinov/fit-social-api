@@ -2,6 +2,7 @@ import { scheduleJob } from "node-schedule";
 import { URL } from "../constants/urls.constants";
 import { writeFile } from "fs";
 import path from "path";
+import { Exercise } from "../types/exercises.types";
 
 export default scheduleJob("0 */2 * * *", async () => {
   try {
@@ -23,10 +24,15 @@ export default scheduleJob("0 */2 * * *", async () => {
       throw new Error("An error occurred while fetching exercises");
     }
 
-    const data = await response.json();
+    const exercises = await response.json();
+
+    const filteredExercises = exercises.filter(
+      (exercise: Exercise) =>
+        !exercise.name.includes("male") && !exercise.name.includes("female")
+    );
 
     const basePath = path.join(__dirname, "..", "assets", "exercises.json");
-    writeFile(basePath, JSON.stringify(data), "utf8", (err) => {
+    writeFile(basePath, JSON.stringify(filteredExercises), "utf8", (err) => {
       if (err) {
         console.error(err);
         throw new Error("An error occurred while writing exercises to file");

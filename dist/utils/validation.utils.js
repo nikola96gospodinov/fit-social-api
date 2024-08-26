@@ -30,11 +30,14 @@ const validateRoute = ({ schema, req, }) => {
         schema: paramsSchema,
         errorMessage: "Unrecognized path parameters",
     });
-    const headers = (0, exports.parseWithSchema)({
-        data: req.headers,
-        schema: schema.headerSchema,
-        errorMessage: "Unrecognized headers",
-    });
+    let headers = {};
+    if (schema.headerSchema) {
+        headers = (0, exports.parseWithSchema)({
+            data: req.headers,
+            schema: schema.headerSchema,
+            errorMessage: "Unrecognized header parameters",
+        });
+    }
     return { query, body, params, headers };
 };
 exports.validateRoute = validateRoute;

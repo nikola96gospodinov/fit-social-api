@@ -74,3 +74,14 @@ export type GetExercisesProps = {
   limit?: number;
   offset?: number;
 };
+
+export type Exercise = {
+  bodyPart: BodyPart;
+  equipment: Equipment;
+  gifUrl: string;
+  id: string;
+  name: string;
+  target: Target;
+  secondaryMuscles: Array<Target | string>;
+  instructions: string[];
+};

@@ -5,11 +5,13 @@ import {
   targetOptions,
   bodyPartOptions,
   equipmentOptions,
+  Exercise,
 } from "../types/exercises.types";
 import { validateRoute } from "../utils/validation.utils";
 import { numericString } from "../utils/schema-helpers";
+import { searchByWordOccurrence } from "../utils/search.utils";
 
-export const getAllExercisesSchema = {
+const getAllExercisesSchema = {
   querySchema: z.strictObject({
     offset: numericString.optional(),
     limit: numericString.optional(),
@@ -33,7 +35,6 @@ export const getAllExercisesSchema = {
       .optional(),
   }),
   paramsSchema: z.strictObject({}),
-  headerSchema: z.strictObject({}),
 };
 
 export const getAllExercises = async (req: Request, res: Response) => {
@@ -43,11 +44,19 @@ export const getAllExercises = async (req: Request, res: Response) => {
       req,
     });
 
-    const { offset = "0", limit = "10" } = query;
+    const { offset = "0", limit = "10", search } = query;
 
-    const exercises = readFileSync("src/assets/exercises.json", "utf8");
+    const fileContent = readFileSync("src/assets/exercises.json", "utf8");
 
-    const response = JSON.parse(exercises).slice(Number(offset), Number(limit));
+    const exercises = JSON.parse(fileContent);
+
+    let response: Exercise[] = [];
+
+    if (search) {
+      response = searchByWordOccurrence(exercises, search);
+    }
+
+    response = response.slice(Number(offset), Number(limit));
 
     res.status(200).json(response);
   } catch (error) {

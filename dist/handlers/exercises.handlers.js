@@ -9,13 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllExercises = exports.getAllExercisesSchema = void 0;
+exports.getAllExercises = void 0;
 const fs_1 = require("fs");
 const zod_1 = require("zod");
 const exercises_types_1 = require("../types/exercises.types");
 const validation_utils_1 = require("../utils/validation.utils");
 const schema_helpers_1 = require("../utils/schema-helpers");
-exports.getAllExercisesSchema = {
+const search_utils_1 = require("../utils/search.utils");
+const getAllExercisesSchema = {
     querySchema: zod_1.z.strictObject({
         offset: schema_helpers_1.numericString.optional(),
         limit: schema_helpers_1.numericString.optional(),
@@ -39,17 +40,21 @@ exports.getAllExercisesSchema = {
             .optional(),
     }),
     paramsSchema: zod_1.z.strictObject({}),
-    headerSchema: zod_1.z.strictObject({}),
 };
 const getAllExercises = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { query } = (0, validation_utils_1.validateRoute)({
-            schema: exports.getAllExercisesSchema,
+            schema: getAllExercisesSchema,
             req,
         });
-        const { offset = "0", limit = "10" } = query;
-        const exercises = (0, fs_1.readFileSync)("src/assets/exercises.json", "utf8");
-        const response = JSON.parse(exercises).slice(Number(offset), Number(limit));
+        const { offset = "0", limit = "10", search } = query;
+        const fileContent = (0, fs_1.readFileSync)("src/assets/exercises.json", "utf8");
+        const exercises = JSON.parse(fileContent);
+        let response = [];
+        if (search) {
+            response = (0, search_utils_1.searchByWordOccurrence)(exercises, search);
+        }
+        response = response.slice(Number(offset), Number(limit));
         res.status(200).json(response);
     }
     catch (error) {

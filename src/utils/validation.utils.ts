@@ -32,7 +32,7 @@ export type Schema<
   querySchema: Query;
   bodySchema: Body;
   paramsSchema: Params;
-  headerSchema: Headers;
+  headerSchema?: Headers;
 };
 
 type Props<
@@ -74,11 +74,15 @@ export const validateRoute = <
     errorMessage: "Unrecognized path parameters",
   });
 
-  const headers = parseWithSchema({
-    data: req.headers,
-    schema: schema.headerSchema,
-    errorMessage: "Unrecognized headers",
-  });
+  let headers = {};
+
+  if (schema.headerSchema) {
+    headers = parseWithSchema({
+      data: req.headers,
+      schema: schema.headerSchema,
+      errorMessage: "Unrecognized header parameters",
+    });
+  }
 
   return { query, body, params, headers };
 };

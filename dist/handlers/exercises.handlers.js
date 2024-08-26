@@ -13,7 +13,8 @@ exports.getAllExercises = exports.getAllExercisesSchema = void 0;
 const fs_1 = require("fs");
 const zod_1 = require("zod");
 const exercises_types_1 = require("../types/exercises.types");
-const schema_helpers_1 = require("../types/schema-helpers");
+const validation_utils_1 = require("../utils/validation.utils");
+const schema_helpers_1 = require("../utils/schema-helpers");
 exports.getAllExercisesSchema = {
     querySchema: zod_1.z.strictObject({
         offset: schema_helpers_1.numericString.optional(),
@@ -36,29 +37,26 @@ exports.getAllExercisesSchema = {
             message: "Invalid equipment filters",
         })
             .optional(),
-    }, {
-        errorMap: (error) => {
-            var _a;
-            if (error.code === "unrecognized_keys") {
-                return {
-                    message: "Unrecognized key(s) in body parameters",
-                };
-            }
-            return {
-                message: (_a = error.message) !== null && _a !== void 0 ? _a : "Invalid body parameters", // Default error message
-            };
-        },
     }),
+    paramsSchema: zod_1.z.strictObject({}),
+    headerSchema: zod_1.z.strictObject({}),
 };
 const getAllExercises = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { query, body } = req;
-        const { offset = "0", limit = "10", search } = query;
+        const { query } = (0, validation_utils_1.validateRoute)({
+            schema: exports.getAllExercisesSchema,
+            req,
+        });
+        const { offset = "0", limit = "10" } = query;
         const exercises = (0, fs_1.readFileSync)("src/assets/exercises.json", "utf8");
         const response = JSON.parse(exercises).slice(Number(offset), Number(limit));
         res.status(200).json(response);
     }
     catch (error) {
+        if (error instanceof zod_1.z.ZodError) {
+            console.error(error.errors);
+            return res.status(400).json(error.errors);
+        }
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
     }

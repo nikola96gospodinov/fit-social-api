@@ -1,62 +1,84 @@
-import { Request, Response, NextFunction } from "express";
-import { ZodObject, ZodRawShape, ZodIssueCode, ZodError } from "zod";
+import { Request } from "express";
+import { ZodIssueCode, z } from "zod";
+import { StrictZodObject } from "../types/helpers.types";
 
-type parseWithSchemaType = {
+type parseWithSchemaType<Schema extends StrictZodObject> = {
   data: unknown;
-  schema?: ZodObject<ZodRawShape, "strict">;
-  errorMessage?: string;
+  schema: Schema;
+  errorMessage: string;
 };
 
-const parseWithSchema = ({
+export const parseWithSchema = <Schema extends StrictZodObject>({
   data,
   schema,
   errorMessage,
-}: parseWithSchemaType) => {
-  if (schema) {
-    schema.parse(data, {
-      errorMap: (error, ctx) => {
-        if (error.code === ZodIssueCode.unrecognized_keys && errorMessage) {
-          return { message: errorMessage };
-        }
-        return { message: ctx.defaultError };
-      },
-    });
-  }
+}: parseWithSchemaType<Schema>) => {
+  return schema.parse(data, {
+    errorMap: (error, ctx) => {
+      if (error.code === ZodIssueCode.unrecognized_keys) {
+        return { message: errorMessage };
+      }
+      return { message: ctx.defaultError };
+    },
+  }) as z.infer<Schema>;
 };
 
-export type Schema = {
-  querySchema?: ZodObject<ZodRawShape, "strict">;
-  bodySchema?: ZodObject<ZodRawShape, "strict">;
-  paramsSchema?: ZodObject<ZodRawShape, "strict">;
+export type Schema<
+  Query extends StrictZodObject,
+  Body extends StrictZodObject,
+  Params extends StrictZodObject,
+  Headers extends StrictZodObject
+> = {
+  querySchema: Query;
+  bodySchema: Body;
+  paramsSchema: Params;
+  headerSchema: Headers;
 };
 
-export const validateWithZod =
-  ({ querySchema, bodySchema, paramsSchema }: Schema) =>
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      parseWithSchema({
-        data: req.query,
-        schema: querySchema,
-        errorMessage: "Unrecognized query parameters",
-      });
+type Props<
+  Query extends StrictZodObject,
+  Body extends StrictZodObject,
+  Params extends StrictZodObject,
+  Headers extends StrictZodObject
+> = {
+  schema: Schema<Query, Body, Params, Headers>;
+  req: Request;
+};
 
-      parseWithSchema({
-        data: req.body,
-        schema: bodySchema,
-        errorMessage: "Unrecognized body parameters",
-      });
+export const validateRoute = <
+  Query extends StrictZodObject,
+  Body extends StrictZodObject,
+  Params extends StrictZodObject,
+  Headers extends StrictZodObject
+>({
+  schema,
+  req,
+}: Props<Query, Body, Params, Headers>) => {
+  const { querySchema, bodySchema, paramsSchema } = schema;
 
-      parseWithSchema({
-        data: req.params,
-        schema: paramsSchema,
-        errorMessage: "Unrecognized path parameters",
-      });
+  const query = parseWithSchema({
+    data: req.query,
+    schema: querySchema,
+    errorMessage: "Unrecognized query parameters",
+  });
 
-      return next();
-    } catch (err) {
-      const error = err instanceof ZodError ? err.errors : err;
+  const body = parseWithSchema({
+    data: req.body,
+    schema: bodySchema,
+    errorMessage: "Unrecognized body parameters",
+  });
 
-      console.error(error);
-      return res.status(400).json(error);
-    }
-  };
+  const params = parseWithSchema({
+    data: req.params,
+    schema: paramsSchema,
+    errorMessage: "Unrecognized path parameters",
+  });
+
+  const headers = parseWithSchema({
+    data: req.headers,
+    schema: schema.headerSchema,
+    errorMessage: "Unrecognized headers",
+  });
+
+  return { query, body, params, headers };
+};

@@ -1,14 +1,8 @@
 import { Router } from "express";
-import {
-  getAllExercises,
-  getAllExercisesSchema,
-} from "./handlers/exercises.handlers";
-import { validateWithZod } from "./utils/validation.utils";
+import { getAllExercises } from "./handlers/exercises.handlers";
 
 const router = Router();
 
-router
-  .route("/exercises")
-  .get(validateWithZod(getAllExercisesSchema), getAllExercises);
+router.route("/exercises").get(getAllExercises);
 
 export default router;

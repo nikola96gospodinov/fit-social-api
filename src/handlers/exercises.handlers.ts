@@ -6,10 +6,10 @@ import {
   bodyPartOptions,
   equipmentOptions,
 } from "../types/exercises.types";
-import { Schema } from "../utils/validation.utils";
-import { numericString } from "../types/schema-helpers";
+import { validateRoute } from "../utils/validation.utils";
+import { numericString } from "../utils/schema-helpers";
 
-export const getAllExercisesSchema: Schema = {
+export const getAllExercisesSchema = {
   querySchema: z.strictObject({
     offset: numericString.optional(),
     limit: numericString.optional(),
@@ -32,13 +32,18 @@ export const getAllExercisesSchema: Schema = {
       })
       .optional(),
   }),
+  paramsSchema: z.strictObject({}),
+  headerSchema: z.strictObject({}),
 };
 
 export const getAllExercises = async (req: Request, res: Response) => {
   try {
-    const { query, body } = req;
+    const { query } = validateRoute({
+      schema: getAllExercisesSchema,
+      req,
+    });
 
-    const { offset = "0", limit = "10", search } = query;
+    const { offset = "0", limit = "10" } = query;
 
     const exercises = readFileSync("src/assets/exercises.json", "utf8");
 
@@ -46,6 +51,11 @@ export const getAllExercises = async (req: Request, res: Response) => {
 
     res.status(200).json(response);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error(error.errors);
+      return res.status(400).json(error.errors);
+    }
+
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }

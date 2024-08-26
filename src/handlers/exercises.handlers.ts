@@ -51,7 +51,7 @@ export const getAllExercises = async (req: Request, res: Response) => {
     let response = exercises;
 
     const { targetFilters, bodyPartFilters, equipmentFilters } = body;
-    const { offset = "0", limit = "10", search } = query;
+    const { offset = "0", limit = "25", search } = query;
 
     if (targetFilters) {
       response = response.filter((exercise: Exercise) =>

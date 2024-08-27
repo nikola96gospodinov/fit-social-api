@@ -5,10 +5,10 @@ import { getExercisesByIds } from "./handlers/get-exercises-by-ids.handler";
 
 const router = Router();
 
-router.route("/exercises").get(getExercises);
+router.route("/exercises").post(getExercises); // We're using post because we're sending a body with the request
 
 router.route("/exercises/:id").get(getExerciseById);
 
-router.route("/exercises-by-ids").get(getExercisesByIds);
+router.route("/exercises-by-ids").post(getExercisesByIds); // We're using post because we're sending a body with the request
 
 export default router;

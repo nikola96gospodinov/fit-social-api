@@ -33,9 +33,10 @@ exports.default = (0, node_schedule_1.scheduleJob)("0 */2 * * *", () => __awaite
             console.error(yield response.json());
             throw new Error("An error occurred while fetching exercises");
         }
-        const data = yield response.json();
+        const exercises = yield response.json();
+        const filteredExercises = exercises.filter((exercise) => !exercise.name.includes("male") && !exercise.name.includes("female"));
         const basePath = path_1.default.join(__dirname, "..", "assets", "exercises.json");
-        (0, fs_1.writeFile)(basePath, JSON.stringify(data), "utf8", (err) => {
+        (0, fs_1.writeFile)(basePath, JSON.stringify(filteredExercises), "utf8", (err) => {
             if (err) {
                 console.error(err);
                 throw new Error("An error occurred while writing exercises to file");

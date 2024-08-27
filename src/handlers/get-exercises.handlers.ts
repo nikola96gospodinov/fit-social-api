@@ -37,7 +37,7 @@ const getAllExercisesSchema = {
   paramsSchema: z.strictObject({}),
 };
 
-export const getAllExercises = async (req: Request, res: Response) => {
+export const getExercises = async (req: Request, res: Response) => {
   try {
     const { query, body } = validateRoute({
       schema: getAllExercisesSchema,

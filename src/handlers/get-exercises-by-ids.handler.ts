@@ -1,22 +1,22 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { numericString } from "../utils/schema-helpers";
+import { numericString, stringToJSONSchema } from "../utils/schema-helpers";
 import { validateRoute } from "../utils/validation.utils";
 import { readFileSync } from "fs";
 import { Exercise } from "../types/exercises.types";
 
 const getExerciseByIdSchema = {
-  querySchema: z.strictObject({}),
-  bodySchema: z.strictObject({
-    ids: z.array(numericString),
+  querySchema: z.strictObject({
+    ids: stringToJSONSchema.pipe(z.array(numericString)),
   }),
+  bodySchema: z.strictObject({}),
   paramsSchema: z.strictObject({}),
 };
 
 export const getExercisesByIds = async (req: Request, res: Response) => {
   try {
     const {
-      body: { ids },
+      query: { ids },
     } = validateRoute({
       schema: getExerciseByIdSchema,
       req,

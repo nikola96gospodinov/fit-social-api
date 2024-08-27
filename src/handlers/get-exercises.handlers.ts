@@ -8,7 +8,7 @@ import {
   Exercise,
 } from "../types/exercises.types";
 import { validateRoute } from "../utils/validation.utils";
-import { numericString } from "../utils/schema-helpers";
+import { numericString, stringToJSONSchema } from "../utils/schema-helpers";
 import { searchByWordOccurrence } from "../utils/search.utils";
 import { isEmpty } from "lodash";
 
@@ -17,30 +17,23 @@ const getAllExercisesSchema = {
     offset: numericString.optional(),
     limit: numericString.optional(),
     search: z.string().optional(),
-  }),
-  bodySchema: z.strictObject({
-    targetFilters: z
-      .array(z.enum(targetOptions), {
-        message: "Invalid target filters",
-      })
+    targetFilters: stringToJSONSchema
+      .pipe(z.array(z.enum(targetOptions)))
       .optional(),
-    bodyPartFilters: z
-      .array(z.enum(bodyPartOptions), {
-        message: "Invalid body part filters",
-      })
+    bodyPartFilters: stringToJSONSchema
+      .pipe(z.array(z.enum(bodyPartOptions)))
       .optional(),
-    equipmentFilters: z
-      .array(z.enum(equipmentOptions), {
-        message: "Invalid equipment filters",
-      })
+    equipmentFilters: stringToJSONSchema
+      .pipe(z.array(z.enum(equipmentOptions)))
       .optional(),
   }),
+  bodySchema: z.strictObject({}),
   paramsSchema: z.strictObject({}),
 };
 
 export const getExercises = async (req: Request, res: Response) => {
   try {
-    const { query, body } = validateRoute({
+    const { query } = validateRoute({
       schema: getAllExercisesSchema,
       req,
     });
@@ -51,8 +44,14 @@ export const getExercises = async (req: Request, res: Response) => {
 
     let response = exercises;
 
-    const { targetFilters, bodyPartFilters, equipmentFilters } = body;
-    const { offset = "0", limit = "25", search } = query;
+    const {
+      offset = "0",
+      limit = "25",
+      search,
+      targetFilters,
+      bodyPartFilters,
+      equipmentFilters,
+    } = query;
 
     if (!isEmpty(targetFilters)) {
       response = response.filter((exercise: Exercise) =>

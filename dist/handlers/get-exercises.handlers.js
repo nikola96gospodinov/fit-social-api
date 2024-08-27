@@ -22,37 +22,29 @@ const getAllExercisesSchema = {
         offset: schema_helpers_1.numericString.optional(),
         limit: schema_helpers_1.numericString.optional(),
         search: zod_1.z.string().optional(),
-    }),
-    bodySchema: zod_1.z.strictObject({
-        targetFilters: zod_1.z
-            .array(zod_1.z.enum(exercises_types_1.targetOptions), {
-            message: "Invalid target filters",
-        })
+        targetFilters: schema_helpers_1.stringToJSONSchema
+            .pipe(zod_1.z.array(zod_1.z.enum(exercises_types_1.targetOptions)))
             .optional(),
-        bodyPartFilters: zod_1.z
-            .array(zod_1.z.enum(exercises_types_1.bodyPartOptions), {
-            message: "Invalid body part filters",
-        })
+        bodyPartFilters: schema_helpers_1.stringToJSONSchema
+            .pipe(zod_1.z.array(zod_1.z.enum(exercises_types_1.bodyPartOptions)))
             .optional(),
-        equipmentFilters: zod_1.z
-            .array(zod_1.z.enum(exercises_types_1.equipmentOptions), {
-            message: "Invalid equipment filters",
-        })
+        equipmentFilters: schema_helpers_1.stringToJSONSchema
+            .pipe(zod_1.z.array(zod_1.z.enum(exercises_types_1.equipmentOptions)))
             .optional(),
     }),
+    bodySchema: zod_1.z.strictObject({}),
     paramsSchema: zod_1.z.strictObject({}),
 };
 const getExercises = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { query, body } = (0, validation_utils_1.validateRoute)({
+        const { query } = (0, validation_utils_1.validateRoute)({
             schema: getAllExercisesSchema,
             req,
         });
         const fileContent = (0, fs_1.readFileSync)("src/assets/exercises.json", "utf8");
         const exercises = JSON.parse(fileContent);
         let response = exercises;
-        const { targetFilters, bodyPartFilters, equipmentFilters } = body;
-        const { offset = "0", limit = "25", search } = query;
+        const { offset = "0", limit = "25", search, targetFilters, bodyPartFilters, equipmentFilters, } = query;
         if (!(0, lodash_1.isEmpty)(targetFilters)) {
             response = response.filter((exercise) => targetFilters === null || targetFilters === void 0 ? void 0 : targetFilters.includes(exercise.target));
         }

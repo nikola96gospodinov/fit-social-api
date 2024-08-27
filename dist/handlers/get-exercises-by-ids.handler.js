@@ -15,15 +15,15 @@ const schema_helpers_1 = require("../utils/schema-helpers");
 const validation_utils_1 = require("../utils/validation.utils");
 const fs_1 = require("fs");
 const getExerciseByIdSchema = {
-    querySchema: zod_1.z.strictObject({}),
-    bodySchema: zod_1.z.strictObject({
-        ids: zod_1.z.array(schema_helpers_1.numericString),
+    querySchema: zod_1.z.strictObject({
+        ids: schema_helpers_1.stringToJSONSchema.pipe(zod_1.z.array(schema_helpers_1.numericString)),
     }),
+    bodySchema: zod_1.z.strictObject({}),
     paramsSchema: zod_1.z.strictObject({}),
 };
 const getExercisesByIds = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { body: { ids }, } = (0, validation_utils_1.validateRoute)({
+        const { query: { ids }, } = (0, validation_utils_1.validateRoute)({
             schema: getExerciseByIdSchema,
             req,
         });

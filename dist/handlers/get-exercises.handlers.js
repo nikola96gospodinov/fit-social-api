@@ -16,6 +16,7 @@ const exercises_types_1 = require("../types/exercises.types");
 const validation_utils_1 = require("../utils/validation.utils");
 const schema_helpers_1 = require("../utils/schema-helpers");
 const search_utils_1 = require("../utils/search.utils");
+const lodash_1 = require("lodash");
 const getAllExercisesSchema = {
     querySchema: zod_1.z.strictObject({
         offset: schema_helpers_1.numericString.optional(),
@@ -52,14 +53,14 @@ const getExercises = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         let response = exercises;
         const { targetFilters, bodyPartFilters, equipmentFilters } = body;
         const { offset = "0", limit = "25", search } = query;
-        if (targetFilters) {
-            response = response.filter((exercise) => targetFilters.includes(exercise.target));
+        if (!(0, lodash_1.isEmpty)(targetFilters)) {
+            response = response.filter((exercise) => targetFilters === null || targetFilters === void 0 ? void 0 : targetFilters.includes(exercise.target));
         }
-        if (bodyPartFilters) {
-            response = response.filter((exercise) => bodyPartFilters.includes(exercise.bodyPart));
+        if (!(0, lodash_1.isEmpty)(bodyPartFilters)) {
+            response = response.filter((exercise) => bodyPartFilters === null || bodyPartFilters === void 0 ? void 0 : bodyPartFilters.includes(exercise.bodyPart));
         }
-        if (equipmentFilters) {
-            response = response.filter((exercise) => equipmentFilters.includes(exercise.equipment));
+        if (!(0, lodash_1.isEmpty)(equipmentFilters)) {
+            response = response.filter((exercise) => equipmentFilters === null || equipmentFilters === void 0 ? void 0 : equipmentFilters.includes(exercise.equipment));
         }
         if (search) {
             response = (0, search_utils_1.searchByWordOccurrence)(response, search);

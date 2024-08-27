@@ -10,6 +10,7 @@ import {
 import { validateRoute } from "../utils/validation.utils";
 import { numericString } from "../utils/schema-helpers";
 import { searchByWordOccurrence } from "../utils/search.utils";
+import { isEmpty } from "lodash";
 
 const getAllExercisesSchema = {
   querySchema: z.strictObject({
@@ -53,21 +54,21 @@ export const getExercises = async (req: Request, res: Response) => {
     const { targetFilters, bodyPartFilters, equipmentFilters } = body;
     const { offset = "0", limit = "25", search } = query;
 
-    if (targetFilters) {
+    if (!isEmpty(targetFilters)) {
       response = response.filter((exercise: Exercise) =>
-        targetFilters.includes(exercise.target)
+        targetFilters?.includes(exercise.target)
       );
     }
 
-    if (bodyPartFilters) {
+    if (!isEmpty(bodyPartFilters)) {
       response = response.filter((exercise: Exercise) =>
-        bodyPartFilters.includes(exercise.bodyPart)
+        bodyPartFilters?.includes(exercise.bodyPart)
       );
     }
 
-    if (equipmentFilters) {
+    if (!isEmpty(equipmentFilters)) {
       response = response.filter((exercise: Exercise) =>
-        equipmentFilters.includes(exercise.equipment)
+        equipmentFilters?.includes(exercise.equipment)
       );
     }
 

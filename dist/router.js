@@ -6,6 +6,6 @@ const get_exercise_by_id_handler_1 = require("./handlers/get-exercise-by-id.hand
 const get_exercises_by_ids_handler_1 = require("./handlers/get-exercises-by-ids.handler");
 const router = (0, express_1.Router)();
 router.route("/exercises").get(get_exercises_handlers_1.getExercises);
-router.route("/exercise/:id").get(get_exercise_by_id_handler_1.getExerciseById);
+router.route("/exercises/:id").get(get_exercise_by_id_handler_1.getExerciseById);
 router.route("/exercises-by-ids").get(get_exercises_by_ids_handler_1.getExercisesByIds);
 exports.default = router;

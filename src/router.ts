@@ -7,7 +7,7 @@ const router = Router();
 
 router.route("/exercises").get(getExercises);
 
-router.route("/exercise/:id").get(getExerciseById);
+router.route("/exercises/:id").get(getExerciseById);
 
 router.route("/exercises-by-ids").get(getExercisesByIds);
 

@@ -53,15 +53,20 @@ export const getExercises = async (req: Request, res: Response) => {
       equipmentFilters,
     } = query;
 
-    response = response.filter((exercise: Exercise) => {
-      return (
-        (!isEmpty(targetFilters) && targetFilters?.includes(exercise.target)) ||
-        (!isEmpty(bodyPartFilters) &&
-          bodyPartFilters?.includes(exercise.bodyPart)) ||
-        (!isEmpty(equipmentFilters) &&
-          equipmentFilters?.includes(exercise.equipment))
+    if (
+      !isEmpty(targetFilters) ||
+      !isEmpty(bodyPartFilters) ||
+      !isEmpty(equipmentFilters)
+    ) {
+      response = response.filter((exercise: Exercise) =>
+        filterByCriteria(
+          exercise,
+          targetFilters,
+          bodyPartFilters,
+          equipmentFilters
+        )
       );
-    });
+    }
 
     if (search) {
       response = searchByWordOccurrence(response, search);
@@ -79,4 +84,21 @@ export const getExercises = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
+};
+
+const filterByCriteria = (
+  exercise: Exercise,
+  targetFilters?: string[],
+  bodyPartFilters?: string[],
+  equipmentFilters?: string[]
+) => {
+  const matchesTarget =
+    !isEmpty(targetFilters) && targetFilters?.includes(exercise.target);
+  const matchesBodyPart =
+    !isEmpty(bodyPartFilters) && bodyPartFilters?.includes(exercise.bodyPart);
+  const matchesEquipment =
+    !isEmpty(equipmentFilters) &&
+    equipmentFilters?.includes(exercise.equipment);
+
+  return matchesTarget || matchesBodyPart || matchesEquipment;
 };

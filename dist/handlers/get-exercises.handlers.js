@@ -45,13 +45,11 @@ const getExercises = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const exercises = JSON.parse(fileContent);
         let response = exercises;
         const { offset = "0", limit = "25", search, targetFilters, bodyPartFilters, equipmentFilters, } = query;
-        response = response.filter((exercise) => {
-            return ((!(0, lodash_1.isEmpty)(targetFilters) && (targetFilters === null || targetFilters === void 0 ? void 0 : targetFilters.includes(exercise.target))) ||
-                (!(0, lodash_1.isEmpty)(bodyPartFilters) &&
-                    (bodyPartFilters === null || bodyPartFilters === void 0 ? void 0 : bodyPartFilters.includes(exercise.bodyPart))) ||
-                (!(0, lodash_1.isEmpty)(equipmentFilters) &&
-                    (equipmentFilters === null || equipmentFilters === void 0 ? void 0 : equipmentFilters.includes(exercise.equipment))));
-        });
+        if (!(0, lodash_1.isEmpty)(targetFilters) ||
+            !(0, lodash_1.isEmpty)(bodyPartFilters) ||
+            !(0, lodash_1.isEmpty)(equipmentFilters)) {
+            response = response.filter((exercise) => filterByCriteria(exercise, targetFilters, bodyPartFilters, equipmentFilters));
+        }
         if (search) {
             response = (0, search_utils_1.searchByWordOccurrence)(response, search);
         }
@@ -68,3 +66,10 @@ const getExercises = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getExercises = getExercises;
+const filterByCriteria = (exercise, targetFilters, bodyPartFilters, equipmentFilters) => {
+    const matchesTarget = !(0, lodash_1.isEmpty)(targetFilters) && (targetFilters === null || targetFilters === void 0 ? void 0 : targetFilters.includes(exercise.target));
+    const matchesBodyPart = !(0, lodash_1.isEmpty)(bodyPartFilters) && (bodyPartFilters === null || bodyPartFilters === void 0 ? void 0 : bodyPartFilters.includes(exercise.bodyPart));
+    const matchesEquipment = !(0, lodash_1.isEmpty)(equipmentFilters) &&
+        (equipmentFilters === null || equipmentFilters === void 0 ? void 0 : equipmentFilters.includes(exercise.equipment));
+    return matchesTarget || matchesBodyPart || matchesEquipment;
+};

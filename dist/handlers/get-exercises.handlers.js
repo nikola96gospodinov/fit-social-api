@@ -45,15 +45,13 @@ const getExercises = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const exercises = JSON.parse(fileContent);
         let response = exercises;
         const { offset = "0", limit = "25", search, targetFilters, bodyPartFilters, equipmentFilters, } = query;
-        if (!(0, lodash_1.isEmpty)(targetFilters)) {
-            response = response.filter((exercise) => targetFilters === null || targetFilters === void 0 ? void 0 : targetFilters.includes(exercise.target));
-        }
-        if (!(0, lodash_1.isEmpty)(bodyPartFilters)) {
-            response = response.filter((exercise) => bodyPartFilters === null || bodyPartFilters === void 0 ? void 0 : bodyPartFilters.includes(exercise.bodyPart));
-        }
-        if (!(0, lodash_1.isEmpty)(equipmentFilters)) {
-            response = response.filter((exercise) => equipmentFilters === null || equipmentFilters === void 0 ? void 0 : equipmentFilters.includes(exercise.equipment));
-        }
+        response = response.filter((exercise) => {
+            return ((!(0, lodash_1.isEmpty)(targetFilters) && (targetFilters === null || targetFilters === void 0 ? void 0 : targetFilters.includes(exercise.target))) ||
+                (!(0, lodash_1.isEmpty)(bodyPartFilters) &&
+                    (bodyPartFilters === null || bodyPartFilters === void 0 ? void 0 : bodyPartFilters.includes(exercise.bodyPart))) ||
+                (!(0, lodash_1.isEmpty)(equipmentFilters) &&
+                    (equipmentFilters === null || equipmentFilters === void 0 ? void 0 : equipmentFilters.includes(exercise.equipment))));
+        });
         if (search) {
             response = (0, search_utils_1.searchByWordOccurrence)(response, search);
         }

@@ -53,23 +53,15 @@ export const getExercises = async (req: Request, res: Response) => {
       equipmentFilters,
     } = query;
 
-    if (!isEmpty(targetFilters)) {
-      response = response.filter((exercise: Exercise) =>
-        targetFilters?.includes(exercise.target)
+    response = response.filter((exercise: Exercise) => {
+      return (
+        (!isEmpty(targetFilters) && targetFilters?.includes(exercise.target)) ||
+        (!isEmpty(bodyPartFilters) &&
+          bodyPartFilters?.includes(exercise.bodyPart)) ||
+        (!isEmpty(equipmentFilters) &&
+          equipmentFilters?.includes(exercise.equipment))
       );
-    }
-
-    if (!isEmpty(bodyPartFilters)) {
-      response = response.filter((exercise: Exercise) =>
-        bodyPartFilters?.includes(exercise.bodyPart)
-      );
-    }
-
-    if (!isEmpty(equipmentFilters)) {
-      response = response.filter((exercise: Exercise) =>
-        equipmentFilters?.includes(exercise.equipment)
-      );
-    }
+    });
 
     if (search) {
       response = searchByWordOccurrence(response, search);

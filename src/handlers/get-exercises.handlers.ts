@@ -72,9 +72,18 @@ export const getExercises = async (req: Request, res: Response) => {
       response = searchByWordOccurrence(response, search);
     }
 
-    response = response.slice(Number(offset), Number(limit));
+    const total = response.length;
+    const offsetNumber = Number(offset);
+    const limitNumber = Number(limit);
 
-    res.status(200).json(response);
+    response = response.slice(offsetNumber, offsetNumber + limitNumber);
+
+    res.status(200).json({
+      offset: offsetNumber,
+      limit: limitNumber,
+      total,
+      data: response,
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error(error.errors);

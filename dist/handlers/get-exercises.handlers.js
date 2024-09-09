@@ -53,8 +53,16 @@ const getExercises = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (search) {
             response = (0, search_utils_1.searchByWordOccurrence)(response, search);
         }
-        response = response.slice(Number(offset), Number(limit));
-        res.status(200).json(response);
+        const total = response.length;
+        const offsetNumber = Number(offset);
+        const limitNumber = Number(limit);
+        response = response.slice(offsetNumber, offsetNumber + limitNumber);
+        res.status(200).json({
+            offset: offsetNumber,
+            limit: limitNumber,
+            total,
+            data: response,
+        });
     }
     catch (error) {
         if (error instanceof zod_1.z.ZodError) {

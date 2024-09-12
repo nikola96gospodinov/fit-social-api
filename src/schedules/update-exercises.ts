@@ -28,7 +28,9 @@ export default scheduleJob("0 */2 * * *", async () => {
 
     const filteredExercises = exercises.filter(
       (exercise: Exercise) =>
-        !exercise.name.includes("male") && !exercise.name.includes("female")
+        !exercise.name.includes("male") &&
+        !exercise.name.includes("female") &&
+        !exercise.name.includes("v.")
     );
 
     const basePath = path.join(__dirname, "..", "assets", "exercises.json");

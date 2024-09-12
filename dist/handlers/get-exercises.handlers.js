@@ -75,8 +75,8 @@ const getExercises = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.getExercises = getExercises;
 const filterByCriteria = (exercise, targetFilters, bodyPartFilters, equipmentFilters) => {
-    const matchesTarget = !(0, lodash_1.isEmpty)(targetFilters) && (targetFilters === null || targetFilters === void 0 ? void 0 : targetFilters.includes(exercise.target));
-    const matchesBodyPart = !(0, lodash_1.isEmpty)(bodyPartFilters) && (bodyPartFilters === null || bodyPartFilters === void 0 ? void 0 : bodyPartFilters.includes(exercise.bodyPart));
+    const matchesTarget = (0, lodash_1.isEmpty)(targetFilters) || (targetFilters === null || targetFilters === void 0 ? void 0 : targetFilters.includes(exercise.target));
+    const matchesBodyPart = (0, lodash_1.isEmpty)(bodyPartFilters) || (bodyPartFilters === null || bodyPartFilters === void 0 ? void 0 : bodyPartFilters.includes(exercise.bodyPart));
     const matchesEquipment = (0, lodash_1.isEmpty)(equipmentFilters) || (equipmentFilters === null || equipmentFilters === void 0 ? void 0 : equipmentFilters.includes(exercise.equipment));
     return (matchesTarget || matchesBodyPart) && matchesEquipment;
 };

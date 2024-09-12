@@ -102,11 +102,11 @@ const filterByCriteria = (
   equipmentFilters?: string[]
 ) => {
   const matchesTarget =
-    isEmpty(targetFilters) || targetFilters?.includes(exercise.target);
+    !isEmpty(targetFilters) && targetFilters?.includes(exercise.target);
   const matchesBodyPart =
-    isEmpty(bodyPartFilters) || bodyPartFilters?.includes(exercise.bodyPart);
+    !isEmpty(bodyPartFilters) && bodyPartFilters?.includes(exercise.bodyPart);
   const matchesEquipment =
     isEmpty(equipmentFilters) || equipmentFilters?.includes(exercise.equipment);
 
-  return matchesTarget && matchesBodyPart && matchesEquipment;
+  return (matchesTarget || matchesBodyPart) && matchesEquipment;
 };

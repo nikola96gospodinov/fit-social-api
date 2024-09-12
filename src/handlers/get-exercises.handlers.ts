@@ -101,12 +101,16 @@ const filterByCriteria = (
   bodyPartFilters?: string[],
   equipmentFilters?: string[]
 ) => {
-  const matchesTarget =
-    isEmpty(targetFilters) || targetFilters?.includes(exercise.target);
-  const matchesBodyPart =
-    isEmpty(bodyPartFilters) || bodyPartFilters?.includes(exercise.bodyPart);
-  const matchesEquipment =
-    isEmpty(equipmentFilters) || equipmentFilters?.includes(exercise.equipment);
+  const matchesTarget = targetFilters?.includes(exercise.target);
+  const matchesBodyPart = bodyPartFilters?.includes(exercise.bodyPart);
+  const matchesEquipment = equipmentFilters?.includes(exercise.equipment);
 
-  return (matchesTarget || matchesBodyPart) && matchesEquipment;
+  if (isEmpty(targetFilters) && isEmpty(bodyPartFilters)) {
+    return matchesEquipment;
+  }
+
+  return (
+    (matchesTarget || matchesBodyPart) &&
+    (isEmpty(equipmentFilters) || matchesEquipment)
+  );
 };

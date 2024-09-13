@@ -8,14 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_schedule_1 = require("node-schedule");
 const urls_constants_1 = require("../constants/urls.constants");
 const fs_1 = require("fs");
-const path_1 = __importDefault(require("path"));
 exports.default = (0, node_schedule_1.scheduleJob)("0 */2 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const url = urls_constants_1.URL.EXERCISE.GET_EXERCISES({
@@ -37,8 +33,7 @@ exports.default = (0, node_schedule_1.scheduleJob)("0 */2 * * *", () => __awaite
         const filteredExercises = exercises.filter((exercise) => !exercise.name.includes("male") &&
             !exercise.name.includes("female") &&
             !exercise.name.includes("v."));
-        const basePath = path_1.default.join(__dirname, "..", "assets", "exercises.json");
-        (0, fs_1.writeFile)(basePath, JSON.stringify(filteredExercises), "utf8", (err) => {
+        (0, fs_1.writeFile)("src/assets/exercises.json", JSON.stringify(filteredExercises), "utf8", (err) => {
             if (err) {
                 console.error(err);
                 throw new Error("An error occurred while writing exercises to file");

@@ -1,7 +1,6 @@
 import { scheduleJob } from "node-schedule";
 import { URL } from "../constants/urls.constants";
 import { writeFile } from "fs";
-import path from "path";
 import { Exercise } from "../types/exercises.types";
 
 export default scheduleJob("0 */2 * * *", async () => {
@@ -33,15 +32,19 @@ export default scheduleJob("0 */2 * * *", async () => {
         !exercise.name.includes("v.")
     );
 
-    const basePath = path.join(__dirname, "..", "assets", "exercises.json");
-    writeFile(basePath, JSON.stringify(filteredExercises), "utf8", (err) => {
-      if (err) {
-        console.error(err);
-        throw new Error("An error occurred while writing exercises to file");
-      } else {
-        console.log("Exercises updated successfully");
+    writeFile(
+      "src/assets/exercises.json",
+      JSON.stringify(filteredExercises),
+      "utf8",
+      (err) => {
+        if (err) {
+          console.error(err);
+          throw new Error("An error occurred while writing exercises to file");
+        } else {
+          console.log("Exercises updated successfully");
+        }
       }
-    });
+    );
   } catch (error) {
     console.error(error);
   }

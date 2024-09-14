@@ -3,7 +3,7 @@ import { URL } from "../constants/urls.constants";
 import { writeFile } from "fs";
 import { Exercise } from "../types/exercises.types";
 
-export default scheduleJob("0 */2 * * *", async () => {
+export const updateExercises = async () => {
   try {
     const url = URL.EXERCISE.GET_EXERCISES({
       limit: 9999,
@@ -48,4 +48,8 @@ export default scheduleJob("0 */2 * * *", async () => {
   } catch (error) {
     console.error(error);
   }
+};
+
+export default scheduleJob("0 */2 * * *", async () => {
+  await updateExercises();
 });

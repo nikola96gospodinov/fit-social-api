@@ -6,10 +6,10 @@ import {
   bodyPartOptions,
   equipmentOptions,
   Exercise,
-} from "../types/exercises.types";
-import { validateRoute } from "../utils/validation.utils";
-import { numericString, stringToJSONSchema } from "../utils/schema-helpers";
-import { searchByWordOccurrence } from "../utils/search.utils";
+} from "../../types/exercises.types";
+import { validateRoute } from "../../utils/validation.utils";
+import { numericString, stringToJSONSchema } from "../../utils/schema-helpers";
+import { searchByWordOccurrence } from "../../utils/search.utils";
 import { isEmpty } from "lodash";
 
 const getAllExercisesSchema = {

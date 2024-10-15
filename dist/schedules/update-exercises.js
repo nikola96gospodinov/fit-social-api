@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateExercises = void 0;
 const node_schedule_1 = require("node-schedule");
 const urls_constants_1 = require("../constants/urls.constants");
 const fs_1 = require("fs");
-exports.default = (0, node_schedule_1.scheduleJob)("0 */2 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+const updateExercises = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const url = urls_constants_1.URL.EXERCISE.GET_EXERCISES({
             limit: 9999,
@@ -46,4 +47,8 @@ exports.default = (0, node_schedule_1.scheduleJob)("0 */2 * * *", () => __awaite
     catch (error) {
         console.error(error);
     }
+});
+exports.updateExercises = updateExercises;
+exports.default = (0, node_schedule_1.scheduleJob)("0 */2 * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, exports.updateExercises)();
 }));

@@ -1,11 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const get_exercises_handlers_1 = require("./handlers/get-exercises.handlers");
-const get_exercise_by_id_handler_1 = require("./handlers/get-exercise-by-id.handler");
-const get_exercises_by_ids_handler_1 = require("./handlers/get-exercises-by-ids.handler");
+const get_exercises_handlers_1 = require("./handlers/exercise/get-exercises.handlers");
+const get_exercise_by_id_handler_1 = require("./handlers/exercise/get-exercise-by-id.handler");
+const get_exercises_by_ids_handler_1 = require("./handlers/exercise/get-exercises-by-ids.handler");
+const search_gym_handler_1 = require("./handlers/gym/search-gym.handler");
 const router = (0, express_1.Router)();
 router.route("/exercises").get(get_exercises_handlers_1.getExercises);
 router.route("/exercises/:id").get(get_exercise_by_id_handler_1.getExerciseById);
 router.route("/exercises-by-ids").get(get_exercises_by_ids_handler_1.getExercisesByIds);
+router.route("/search-gyms").get(search_gym_handler_1.searchGyms);
 exports.default = router;

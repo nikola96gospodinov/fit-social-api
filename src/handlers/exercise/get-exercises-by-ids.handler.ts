@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { numericString, stringToJSONSchema } from "../utils/schema-helpers";
-import { validateRoute } from "../utils/validation.utils";
+import { numericString, stringToJSONSchema } from "../../utils/schema-helpers";
+import { validateRoute } from "../../utils/validation.utils";
 import { readFileSync } from "fs";
-import { Exercise } from "../types/exercises.types";
+import { Exercise } from "../../types/exercises.types";
 
 const getExerciseByIdSchema = {
   querySchema: z.strictObject({

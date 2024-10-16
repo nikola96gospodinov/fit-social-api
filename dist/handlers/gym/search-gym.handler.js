@@ -11,27 +11,58 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.searchGyms = void 0;
 const places_1 = require("@googlemaps/places");
-const searchGyms = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const zod_1 = require("zod");
+const schema_helpers_1 = require("../../utils/schema-helpers");
+const validation_utils_1 = require("../../utils/validation.utils");
+const client = new places_1.PlacesClient({
+    // TODO: Restrict key
+    apiKey: process.env.GOOGLE_API_KEY,
+    libVersion: "v1",
+});
+const searchGymsSchema = {
+    querySchema: zod_1.z.strictObject({
+        textQuery: zod_1.z.string(),
+        offset: schema_helpers_1.numericString.optional(),
+        limit: schema_helpers_1.numericString.optional(),
+    }),
+    bodySchema: zod_1.z.strictObject({}),
+    paramsSchema: zod_1.z.strictObject({}),
+};
+const searchGyms = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
-        const client = new places_1.PlacesClient({
-            apiKey: process.env.GOOGLE_API_KEY,
-            libVersion: "v1",
+        const { query } = (0, validation_utils_1.validateRoute)({
+            schema: searchGymsSchema,
+            req: req,
         });
         // Construct request
         const request = {
-            textQuery: "Tacos in Mountain View",
+            textQuery: query.textQuery,
+            includedType: "gym",
         };
         // Run request
         const response = yield client.searchText(request, {
             otherArgs: {
                 headers: {
-                    "X-Goog-FieldMask": "places.displayName",
+                    "X-Goog-FieldMask": "places.displayName,places.id,places.formattedAddress",
                 },
             },
         });
-        res.status(200).json({ response });
+        const gyms = (_a = response[0].places) === null || _a === void 0 ? void 0 : _a.map((place) => {
+            var _a;
+            return ({
+                id: place.id,
+                name: (_a = place.displayName) === null || _a === void 0 ? void 0 : _a.text,
+                address: place.formattedAddress,
+            });
+        }).filter((place) => place.name && place.address);
+        res.status(200).json(gyms);
     }
     catch (error) {
+        if (error instanceof zod_1.z.ZodError) {
+            console.error(error.errors);
+            return res.status(400).json(error.errors);
+        }
         console.log(error);
         res.status(500).json({ error: "Something went wrong" });
     }

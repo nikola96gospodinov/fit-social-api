@@ -39,32 +39,25 @@ const searchGyms = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
         const locationBias = query.latitude && query.longitude
             ? {
-                circle: {
-                    center: {
-                        latitude: Number(query.latitude),
-                        longitude: Number(query.longitude),
+                locationBias: {
+                    circle: {
+                        center: {
+                            latitude: Number(query.latitude),
+                            longitude: Number(query.longitude),
+                        },
                     },
                 },
             }
             : {};
-        // Construct request
-        const request = Object.assign({ textQuery: query.textQuery, includedType: "gym" }, locationBias);
-        // Run request
-        const response = yield client.searchText(request, {
-            otherArgs: {
-                headers: {
-                    "X-Goog-FieldMask": "places.displayName,places.id,places.formattedAddress",
-                },
-            },
-        });
-        const gyms = (_a = response[0].places) === null || _a === void 0 ? void 0 : _a.map((place) => {
-            var _a;
+        const response = yield client.autocompletePlaces(Object.assign({ input: query.textQuery, includedPrimaryTypes: ["gym"] }, locationBias));
+        const gyms = (_a = response[0].suggestions) === null || _a === void 0 ? void 0 : _a.map((suggestion) => {
+            var _a, _b, _c, _d, _e, _f, _g;
             return ({
-                id: place.id,
-                name: (_a = place.displayName) === null || _a === void 0 ? void 0 : _a.text,
-                address: place.formattedAddress,
+                id: (_a = suggestion.placePrediction) === null || _a === void 0 ? void 0 : _a.placeId,
+                primaryName: (_d = (_c = (_b = suggestion.placePrediction) === null || _b === void 0 ? void 0 : _b.structuredFormat) === null || _c === void 0 ? void 0 : _c.mainText) === null || _d === void 0 ? void 0 : _d.text,
+                secondaryName: (_g = (_f = (_e = suggestion.placePrediction) === null || _e === void 0 ? void 0 : _e.structuredFormat) === null || _f === void 0 ? void 0 : _f.secondaryText) === null || _g === void 0 ? void 0 : _g.text,
             });
-        }).filter((place) => place.name && place.address);
+        });
         res.status(200).json(gyms);
     }
     catch (error) {

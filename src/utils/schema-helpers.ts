@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { json } from "../types/json.types";
 
-export const numericString = z.string().regex(/^\d+$/, {
+export const numericString = z.string().regex(/^-?\d*\.?\d+$/, {
   message: "You need to enter a numeric value",
 });
 

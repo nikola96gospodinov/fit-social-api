@@ -24,6 +24,8 @@ const searchGymsSchema = {
         textQuery: zod_1.z.string(),
         offset: schema_helpers_1.numericString.optional(),
         limit: schema_helpers_1.numericString.optional(),
+        latitude: schema_helpers_1.numericString.optional(),
+        longitude: schema_helpers_1.numericString.optional(),
     }),
     bodySchema: zod_1.z.strictObject({}),
     paramsSchema: zod_1.z.strictObject({}),
@@ -35,11 +37,18 @@ const searchGyms = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             schema: searchGymsSchema,
             req: req,
         });
+        const locationBias = query.latitude && query.longitude
+            ? {
+                circle: {
+                    center: {
+                        latitude: Number(query.latitude),
+                        longitude: Number(query.longitude),
+                    },
+                },
+            }
+            : {};
         // Construct request
-        const request = {
-            textQuery: query.textQuery,
-            includedType: "gym",
-        };
+        const request = Object.assign({ textQuery: query.textQuery, includedType: "gym" }, locationBias);
         // Run request
         const response = yield client.searchText(request, {
             otherArgs: {
@@ -64,7 +73,7 @@ const searchGyms = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             return res.status(400).json(error.errors);
         }
         console.log(error);
-        res.status(500).json({ error: "Something went wrong" });
+        res.status(500).json({ error: JSON.stringify(error) });
     }
 });
 exports.searchGyms = searchGyms;

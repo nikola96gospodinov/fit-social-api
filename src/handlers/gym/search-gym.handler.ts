@@ -15,6 +15,8 @@ const searchGymsSchema = {
     textQuery: z.string(),
     offset: numericString.optional(),
     limit: numericString.optional(),
+    latitude: numericString.optional(),
+    longitude: numericString.optional(),
   }),
   bodySchema: z.strictObject({}),
   paramsSchema: z.strictObject({}),
@@ -27,10 +29,23 @@ export const searchGyms = async (req: Request, res: Response) => {
       req: req,
     });
 
+    const locationBias =
+      query.latitude && query.longitude
+        ? {
+            circle: {
+              center: {
+                latitude: Number(query.latitude),
+                longitude: Number(query.longitude),
+              },
+            },
+          }
+        : {};
+
     // Construct request
     const request = {
       textQuery: query.textQuery,
       includedType: "gym",
+      ...locationBias,
     };
 
     // Run request
@@ -59,6 +74,6 @@ export const searchGyms = async (req: Request, res: Response) => {
     }
 
     console.log(error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: JSON.stringify(error) });
   }
 };

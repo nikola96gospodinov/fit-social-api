@@ -11,5 +11,5 @@ app.listen(port, async () => {
   console.log(`Server running on port ${port}`);
 
   // Update exercises on server start as the server might be restarted
-  // await updateExercises();
+  await updateExercises();
 });

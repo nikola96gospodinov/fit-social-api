@@ -42,6 +42,4 @@ require("./schedules/update-exercises");
 const port = process.env.PORT || 3000;
 server_1.default.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Server running on port ${port}`);
-    // Update exercises on server start as the server might be restarted
-    // await updateExercises();
 }));

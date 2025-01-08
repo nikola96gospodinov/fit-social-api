@@ -65,8 +65,8 @@ const searchGyms = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             console.error(error.errors);
             return res.status(400).json(error.errors);
         }
-        console.log(error);
-        res.status(500).json({ error: JSON.stringify(error) });
+        console.error(error);
+        res.status(500).json({ error: "Something went wrong" });
     }
 });
 exports.searchGyms = searchGyms;
